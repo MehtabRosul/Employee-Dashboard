@@ -1,0 +1,109 @@
+.theme-toggle {
+    position: relative;
+    padding: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    transition: background-color var(--transition-normal);
+
+    &:hover {
+        background: rgba(var(--color-primary), 0.1);
+
+        .sun-moon-wrapper {
+            transform: rotate(-10deg);
+        }
+    }
+
+    &:active .sun-moon-wrapper {
+        transform: scale(0.9) rotate(-10deg);
+    }
+}
+
+.sun-moon-wrapper {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    color: var(--color-text-primary);
+    transition: transform 0.5s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+}
+
+/* Sun Core */
+.sun-core {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.5s cubic-bezier(0.5, 1.5, 0.75, 1);
+}
+
+/* Mask Animation - Creates the Crescent */
+.moon-spot {
+    cx: 26px;
+    cy: 4px;
+    /* Start outside */
+    transition:
+        cx 0.5s cubic-bezier(0, 0, 0, 1),
+        cy 0.5s cubic-bezier(0, 0, 0, 1);
+}
+
+/* Sun Rays */
+.sun-rays {
+    position: absolute;
+    inset: -25%;
+    /* Expand to fit rays */
+    width: 150%;
+    height: 150%;
+    opacity: 1;
+    transform: rotate(0deg);
+    transition:
+        opacity 0.2s 0.2s ease,
+        /* Delay fade in */
+        transform 0.5s cubic-bezier(0.5, 1.5, 0.75, 1);
+}
+
+.rays-group {
+    transform-origin: center;
+}
+
+/* =========================================
+     DARK MODE STATE
+     ========================================= */
+
+.theme-toggle.dark {
+    color: white;
+    /* Force white icon in dark mode */
+
+    .sun-moon-wrapper {
+        transform: rotate(-15deg);
+    }
+
+    &:hover .sun-moon-wrapper {
+        transform: rotate(-5deg);
+    }
+
+    /* Morph sun body to moon */
+    .sun-core {
+        transform: scale(0.9);
+    }
+
+    /* Move mask into place to cut out crescent */
+    .moon-spot {
+        cx: 17px;
+        cy: 9px;
+    }
+
+    /* Hide Rays */
+    .sun-rays {
+        opacity: 0;
+        transform: rotate(90deg) scale(0.5);
+        transition:
+            opacity 0.2s ease,
+            transform 0.5s cubic-bezier(0, 0, 0, 1);
+    }
+}

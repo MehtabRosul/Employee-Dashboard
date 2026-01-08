@@ -1,0 +1,349 @@
+.app-container {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--color-background);
+    position: relative;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: var(--gradient-mesh);
+        animation: gradientShift 20s ease infinite;
+        opacity: 0.6;
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
+        opacity: 0.015;
+        z-index: 0;
+        pointer-events: none;
+    }
+}
+
+/* Sidebar Styles */
+.sidebar {
+    position: relative;
+    z-index: 10;
+    width: 280px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: var(--glass-bg-strong);
+    backdrop-filter: blur(var(--glass-blur-strong));
+    -webkit-backdrop-filter: blur(var(--glass-blur-strong));
+    border-right: 1.5px solid var(--glass-border);
+    transition: width 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+    /* Spring transition */
+    flex-shrink: 0;
+    padding: var(--space-6);
+
+    &.collapsed {
+        width: 88px;
+        padding: var(--space-6) var(--space-4);
+
+        .brand-info {
+            opacity: 0;
+            transform: translateX(-10px);
+            pointer-events: none;
+            width: 0;
+        }
+
+        .toggle-btn {
+            transform: rotate(180deg);
+        }
+
+        .nav-label {
+            opacity: 0;
+            width: 0;
+            margin: 0;
+        }
+
+        .user-info {
+            opacity: 0;
+            width: 0;
+            display: none;
+        }
+
+        .sidebar-footer {
+            flex-direction: column;
+            gap: var(--space-4);
+        }
+    }
+}
+
+/* Brand Section */
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-10);
+    height: 48px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.brand-logo {
+    min-width: 40px;
+    height: 40px;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: var(--shadow-colored);
+
+    svg {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+.brand-info {
+    transition: all 0.3s ease;
+
+    h1 {
+        font-size: var(--font-size-xl);
+        font-weight: var(--font-weight-extrabold);
+        color: var(--color-text-primary);
+        margin: 0;
+        line-height: 1;
+        letter-spacing: -0.02em;
+    }
+
+    p {
+        font-size: var(--font-size-xs);
+        color: var(--color-text-tertiary);
+        margin: 0;
+        font-weight: var(--font-weight-medium);
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+}
+
+.toggle-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-spring);
+    position: absolute;
+    /* Float toggle button */
+    right: -14px;
+    top: 36px;
+    z-index: 20;
+    box-shadow: var(--shadow-md);
+
+    svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    &:hover {
+        background: var(--color-primary);
+        color: white;
+        border-color: var(--color-primary);
+        transform: scale(1.1);
+    }
+}
+
+/* Navigation */
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    /* Hide scrollbar */
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    border-radius: var(--radius-xl);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+    height: 48px;
+
+    &:hover {
+        background: var(--color-surface-hover);
+        color: var(--color-primary);
+        transform: translateX(4px);
+
+        .nav-icon {
+            color: var(--color-primary);
+            transform: scale(1.05);
+        }
+    }
+
+    &.active {
+        background: hsla(var(--color-primary-h), var(--color-primary-s), var(--color-primary-l), 0.08);
+        color: var(--color-primary);
+        font-weight: var(--font-weight-bold);
+
+        .nav-icon {
+            color: var(--color-primary);
+        }
+
+        &::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 25%;
+            bottom: 25%;
+            width: 3px;
+            background: var(--color-primary);
+            border-radius: 0 4px 4px 0;
+            box-shadow: 0 0 8px hsla(var(--color-primary-h), var(--color-primary-s), var(--color-primary-l), 0.3);
+        }
+
+        &:hover {
+            transform: translateX(4px);
+            background: hsla(var(--color-primary-h), var(--color-primary-s), var(--color-primary-l), 0.12);
+        }
+    }
+}
+
+/* Specific adjustments for active state in collapsed mode */
+.sidebar.collapsed .nav-item.active {
+    background: hsla(var(--color-primary-h), var(--color-primary-s), var(--color-primary-l), 0.12);
+
+    .nav-icon {
+        transform: scale(1.05);
+    }
+
+    &::before {
+        left: -4px;
+        /* Move indicator to the very edge when collapsed */
+    }
+}
+
+.nav-icon {
+    min-width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform var(--transition-spring);
+
+    svg {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+.nav-label {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    transition: opacity 0.3s ease;
+}
+
+/* Footer */
+.sidebar-footer {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--glass-border);
+    transition: all 0.3s ease;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    overflow: hidden;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+}
+
+.avatar {
+    min-width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    background: var(--gradient-primary-vivid);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: var(--font-weight-bold);
+    box-shadow: var(--shadow-sm);
+    font-size: var(--font-size-sm);
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    transition: opacity 0.3s ease;
+
+    .name {
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-bold);
+        color: var(--color-text-primary);
+    }
+
+    .role {
+        font-size: var(--font-size-xs);
+        color: var(--color-text-tertiary);
+    }
+}
+
+/* Main Content Styles */
+.main-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-8);
+    position: relative;
+    z-index: 1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .app-container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--glass-border);
+        padding: var(--space-4);
+        flex-direction: row;
+        align-items: center;
+        /* Mobile specific adjustments would go here, omitting for brevity to focus on User request for Left Sidebar */
+    }
+}

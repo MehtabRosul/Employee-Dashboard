@@ -1,0 +1,100 @@
+<div class="employee-form-container glass-card">
+    <div class="form-header">
+        <h2>{{ employee ? 'Edit Employee' : 'Add New Employee' }}</h2>
+        <p>{{ employee ? 'Update employee information' : 'Fill in the details to add a new team member' }}</p>
+    </div>
+
+    <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()" class="employee-form">
+        <!-- Name Field -->
+        <div class="input-group">
+            <label class="input-label" for="name">
+                Full Name <span class="input-required">*</span>
+            </label>
+            <input id="name" type="text" class="input" [class.error]="hasError('name')"
+                [class.success]="isValid('name')" formControlName="name" placeholder="Enter employee name" />
+            <div class="input-error" *ngIf="hasError('name')">
+                {{ getError('name') }}
+            </div>
+            <div class="input-hint" *ngIf="!hasError('name')">Minimum 3 characters, letters only</div>
+        </div>
+
+        <!-- Email Field -->
+        <div class="input-group">
+            <label class="input-label" for="email">
+                Email Address <span class="input-required">*</span>
+            </label>
+            <input id="email" type="email" class="input" [class.error]="hasError('email')"
+                [class.success]="isValid('email')" formControlName="email" placeholder="employee@company.com" />
+            <div class="input-error" *ngIf="hasError('email')">
+                {{ getError('email') }}
+            </div>
+        </div>
+
+        <!-- Department Field -->
+        <div class="input-group">
+            <label class="input-label" for="department">
+                Department <span class="input-required">*</span>
+            </label>
+            <select id="department" class="input" [class.error]="hasError('department')"
+                [class.success]="isValid('department')" formControlName="department">
+                <option value="">Select Department</option>
+                <option *ngFor="let dept of departments" [value]="dept">{{ dept }}</option>
+            </select>
+            <div class="input-error" *ngIf="hasError('department')">
+                {{ getError('department') }}
+            </div>
+        </div>
+
+        <!-- Date of Joining Field -->
+        <div class="input-group">
+            <label class="input-label" for="dateOfJoining">
+                Date of Joining <span class="input-required">*</span>
+            </label>
+            <input id="dateOfJoining" type="date" class="input" [class.error]="hasError('dateOfJoining')"
+                [class.success]="isValid('dateOfJoining')" formControlName="dateOfJoining" [max]="maxDate" />
+            <div class="input-error" *ngIf="hasError('dateOfJoining')">
+                {{ getError('dateOfJoining') }}
+            </div>
+            <div class="input-hint" *ngIf="!hasError('dateOfJoining')">Cannot be a future date</div>
+        </div>
+
+        <!-- Status Field -->
+        <div class="input-group">
+            <label class="input-label" for="status">
+                Employment Status
+            </label>
+            <select id="status" class="input" formControlName="status">
+                <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+            </select>
+        </div>
+
+        <!-- Performance Field (Optional) -->
+        <div class="input-group">
+            <label class="input-label" for="performance">
+                Performance Score: <strong>{{ employeeForm.get('performance')?.value }}%</strong>
+            </label>
+            <input id="performance" type="range" class="range-input" formControlName="performance" min="0" max="100"
+                step="1" />
+            <div class="range-labels">
+                <span>0%</span>
+                <span>50%</span>
+                <span>100%</span>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <button type="button" class="btn-secondary" (click)="onCancel()" [disabled]="isSubmitting">
+                Cancel
+            </button>
+
+            <button type="submit" class="btn-primary" [disabled]="employeeForm.invalid || isSubmitting">
+                <span *ngIf="!isSubmitting">{{ employee ? 'Update Employee' : 'Add Employee' }}</span>
+                <span *ngIf="isSubmitting" class="flex items-center gap-2">
+                    <span class="spinner spinner-sm"></span>
+                    Saving...
+                </span>
+            </button>
+        </div>
+    </form>
+</div>

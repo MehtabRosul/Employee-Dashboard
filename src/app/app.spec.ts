@@ -1,8 +1,21 @@
 import { TestBed } from '@angular/core/testing';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { App } from './app';
+
+import 'zone.js';
+import 'zone.js/testing';
+import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
 
 describe('App', () => {
   beforeEach(async () => {
+    try {
+      TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {
+        teardown: { destroyAfterEach: false }
+      });
+    } catch {
+      // Already initialized
+    }
+
     await TestBed.configureTestingModule({
       imports: [App],
     }).compileComponents();
@@ -14,10 +27,10 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render title', async () => {
+  it('should render router-outlet', () => {
     const fixture = TestBed.createComponent(App);
-    await fixture.whenStable();
+    fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, employee-dashboard');
+    expect(compiled.querySelector('router-outlet')).toBeTruthy();
   });
 });

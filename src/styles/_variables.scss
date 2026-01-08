@@ -1,0 +1,249 @@
+/* ============================================
+   CSS Variables - Premium Design System
+   World-Class UI Tokens
+   ============================================ */
+
+:root {
+  /* Premium Color Palette - Light Theme */
+  --color-primary-h: 262;
+  --color-primary-s: 83%;
+  --color-primary-l: 58%;
+  --color-primary: hsl(var(--color-primary-h), var(--color-primary-s), var(--color-primary-l));
+  --color-primary-light: hsl(var(--color-primary-h), 85%, 68%);
+  --color-primary-dark: hsl(var(--color-primary-h), 80%, 48%);
+  --color-primary-ultra-light: hsl(var(--color-primary-h), 90%, 95%);
+
+  --color-secondary-h: 200;
+  --color-secondary-s: 85%;
+  --color-secondary-l: 52%;
+  --color-secondary: hsl(var(--color-secondary-h), var(--color-secondary-s), var(--color-secondary-l));
+  --color-secondary-light: hsl(var(--color-secondary-h), 88%, 62%);
+  --color-secondary-dark: hsl(var(--color-secondary-h), 82%, 42%);
+
+  --color-accent: hsl(320, 85%, 58%);
+  --color-accent-light: hsl(320, 88%, 68%);
+
+  --color-success: hsl(142, 78%, 44%);
+  --color-success-light: hsl(142, 80%, 54%);
+  --color-success-ultra-light: hsl(142, 75%, 92%);
+  --color-warning: hsl(38, 94%, 49%);
+  --color-warning-light: hsl(38, 96%, 59%);
+  --color-error: hsl(0, 74%, 50%);
+  --color-error-light: hsl(0, 76%, 60%);
+  --color-info: hsl(210, 92%, 54%);
+
+  /* Premium Neutral Colors */
+  --color-background: hsl(220, 25%, 98%);
+  --color-surface: hsl(0, 0%, 100%);
+  --color-surface-elevated: hsla(0, 0%, 100%, 0.98);
+  --color-surface-hover: hsl(220, 30%, 99%);
+  --color-text-primary: hsl(222, 50%, 8%);
+  --color-text-secondary: hsl(215, 18%, 42%);
+  --color-text-tertiary: hsl(215, 16%, 60%);
+  --color-text-muted: hsl(215, 14%, 72%);
+  --color-border: hsl(214, 35%, 88%);
+  --color-border-light: hsl(210, 28%, 93%);
+  --color-border-focus: hsla(var(--color-primary-h), var(--color-primary-s), var(--color-primary-l), 0.5);
+  --color-hover: hsl(210, 45%, 97%);
+
+  /* Premium Gradients */
+  --gradient-primary: linear-gradient(135deg,
+      hsl(var(--color-primary-h), 88%, 62%) 0%,
+      hsl(var(--color-secondary-h), 88%, 58%) 100%);
+  --gradient-primary-vivid: linear-gradient(135deg,
+      hsl(var(--color-primary-h), 90%, 65%) 0%,
+      hsl(var(--color-secondary-h), 90%, 60%) 20%,
+      hsl(320, 85%, 65%) 100%);
+  --gradient-success: linear-gradient(135deg, hsl(142, 82%, 48%) 0%, hsl(142, 85%, 38%) 100%);
+  --gradient-error: linear-gradient(135deg, hsl(0, 78%, 54%) 0%, hsl(0, 82%, 44%) 100%);
+  --gradient-surface: linear-gradient(145deg,
+      hsla(0, 0%, 100%, 1) 0%,
+      hsla(220, 30%, 99%, 1) 100%);
+  --gradient-mesh:
+    radial-gradient(at 27% 37%, hsla(262, 85%, 72%, 0.12) 0px, transparent 50%),
+    radial-gradient(at 97% 21%, hsla(200, 88%, 68%, 0.12) 0px, transparent 50%),
+    radial-gradient(at 52% 99%, hsla(320, 80%, 70%, 0.08) 0px, transparent 50%),
+    radial-gradient(at 10% 29%, hsla(142, 80%, 58%, 0.10) 0px, transparent 50%),
+    radial-gradient(at 97% 96%, hsla(38, 92%, 58%, 0.08) 0px, transparent 50%),
+    radial-gradient(at 33% 50%, hsla(210, 90%, 62%, 0.10) 0px, transparent 50%),
+    radial-gradient(at 79% 53%, hsla(343, 80%, 68%, 0.08) 0px, transparent 50%);
+  --gradient-spotlight: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      hsla(var(--color-primary-h), 80%, 85%, 0.06),
+      transparent 40%);
+
+  /* Premium Shadow System - Multi-layer depth */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  --shadow-sm:
+    0 1px 3px 0 rgba(0, 0, 0, 0.08),
+    0 1px 2px -1px rgba(0, 0, 0, 0.06);
+  --shadow-md:
+    0 4px 6px -1px rgba(0, 0, 0, 0.08),
+    0 2px 4px -2px rgba(0, 0, 0, 0.06);
+  --shadow-lg:
+    0 10px 15px -3px rgba(0, 0, 0, 0.08),
+    0 4px 6px -4px rgba(0, 0, 0, 0.06);
+  --shadow-xl:
+    0 20px 25px -5px rgba(0, 0, 0, 0.08),
+    0 8px 10px -6px rgba(0, 0, 0, 0.06);
+  --shadow-2xl:
+    0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  --shadow-3xl:
+    0 35px 60px -15px rgba(0, 0, 0, 0.20);
+  --shadow-colored:
+    0 10px 40px -8px hsla(var(--color-primary-h), 85%, 58%, 0.25),
+    0 0 0 1px hsla(var(--color-primary-h), 85%, 58%, 0.08);
+  --shadow-colored-lg:
+    0 20px 60px -10px hsla(var(--color-primary-h), 85%, 58%, 0.30),
+    0 0 0 1px hsla(var(--color-primary-h), 85%, 58%, 0.10);
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  --shadow-glow: 0 0 20px 0 hsla(var(--color-primary-h), 85%, 68%, 0.3);
+
+  /* Spacing Scale */
+  --space-1: 0.25rem;
+  /* 4px */
+  --space-2: 0.5rem;
+  /* 8px */
+  --space-3: 0.75rem;
+  /* 12px */
+  --space-4: 1rem;
+  /* 16px */
+  --space-5: 1.25rem;
+  /* 20px */
+  --space-6: 1.5rem;
+  /* 24px */
+  --space-8: 2rem;
+  /* 32px */
+  --space-10: 2.5rem;
+  /* 40px */
+  --space-12: 3rem;
+  /* 48px */
+  --space-16: 4rem;
+  /* 64px */
+  --space-20: 5rem;
+  /* 80px */
+  --space-24: 6rem;
+  /* 96px */
+
+  /* Border Radius - Premium curves */
+  --radius-xs: 0.25rem;
+  /* 4px */
+  --radius-sm: 0.5rem;
+  /* 8px */
+  --radius-md: 0.75rem;
+  /* 12px */
+  --radius-lg: 1rem;
+  /* 16px */
+  --radius-xl: 1.25rem;
+  /* 20px */
+  --radius-2xl: 1.75rem;
+  /* 28px */
+  --radius-3xl: 2rem;
+  /* 32px */
+  --radius-full: 9999px;
+
+  /* Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --font-size-xs: 0.75rem;
+  /* 12px */
+  --font-size-sm: 0.875rem;
+  /* 14px */
+  --font-size-base: 1rem;
+  /* 16px */
+  --font-size-lg: 1.125rem;
+  /* 18px */
+  --font-size-xl: 1.25rem;
+  /* 20px */
+  --font-size-2xl: 1.5rem;
+  /* 24px */
+  --font-size-3xl: 1.875rem;
+  /* 30px */
+  --font-size-4xl: 2.25rem;
+  /* 36px */
+  --font-size-5xl: 3rem;
+  /* 48px */
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  --line-height-tight: 1.25;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* Premium Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 600ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --transition-spring: 400ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  /* Z-index Scale */
+  --z-base: 0;
+  --z-dropdown: 1000;
+  --z-sticky: 1100;
+  --z-modal-backdrop: 1300;
+  --z-modal: 1400;
+  --z-notification: 1500;
+  --z-tooltip: 1600;
+
+  /* Premium Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-bg-strong: rgba(255, 255, 255, 0.90);
+  --glass-border: rgba(255, 255, 255, 0.25);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  --glass-blur: 20px;
+  --glass-blur-strong: 32px;
+}
+
+/* Dark Theme */
+.dark-theme {
+  --color-background: hsl(222, 47%, 8%);
+  --color-surface: hsl(217, 33%, 12%);
+  --color-surface-elevated: hsl(217, 33%, 16%);
+  --color-text-primary: hsl(0, 0%, 95%);
+  --color-text-secondary: hsl(215, 20%, 65%);
+  --color-text-tertiary: hsl(215, 16%, 47%);
+  --color-border: hsl(217, 33%, 20%);
+  --color-border-light: hsl(217, 33%, 18%);
+  --color-hover: hsl(217, 33%, 18%);
+  --color-surface-hover: hsla(217, 33%, 20%, 0.8);
+
+  /* Adjust colors for dark mode */
+  --color-primary-l: 65%;
+  --color-secondary-l: 60%;
+
+  /* Dark gradients */
+  --gradient-surface: linear-gradient(145deg, hsl(217, 33%, 12%) 0%, hsl(217, 33%, 14%) 100%);
+  --gradient-mesh: radial-gradient(at 40% 20%, hsla(262, 80%, 60%, 0.15) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, hsla(200, 80%, 55%, 0.15) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, hsla(142, 76%, 45%, 0.15) 0px, transparent 50%);
+
+  /* Dark shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  --shadow-colored: 0 10px 30px -5px hsla(var(--color-primary-h), var(--color-primary-s), 40%, 0.5);
+
+  /* Glassmorphism for dark theme */
+  --glass-bg: rgba(30, 41, 59, 0.75);
+  --glass-bg-strong: rgba(15, 23, 42, 0.85);
+  /* Proper dark background for cards */
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-blur: 20px;
+  --glass-blur-strong: 32px;
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* Theme transition */
+* {
+  transition: background-color var(--transition-normal),
+    border-color var(--transition-normal),
+    color var(--transition-normal);
+}

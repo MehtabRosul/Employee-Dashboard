@@ -1,0 +1,669 @@
+<div class="employee-list-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h1>Employees</h1>
+            <p>Manage, filter and track your global workforce</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-secondary" (click)="exportCSV()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18"
+                    height="18">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Export CSV
+            </button>
+            <button class="btn-primary" (click)="addEmployee()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18"
+                    height="18">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Add Employee
+            </button>
+        </div>
+    </div>
+
+    <!-- Smart Filter Bar: Minimal & High-End -->
+    <div class="smart-filter-bar shadow-glow">
+        <div class="bar-main-row">
+            <!-- Search Hub -->
+            <div class="search-hub" [class.focused]="searchActive">
+                <svg class="icon search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="M21 21l-4.35-4.35" />
+                </svg>
+                <input type="text" class="smart-search-input" placeholder="Search global workforce..."
+                    [ngModel]="searchQuery()" (ngModelChange)="onSearch($event)" (focus)="searchActive = true"
+                    (blur)="searchActive = false" />
+            </div>
+
+            <div class="flex-spacer"></div>
+
+            <!-- Integrated Sort -->
+            <div class="smart-dropdown">
+                <button class="dropdown-trigger" [class.active]="sortBy() !== 'name' || sortOrder() !== 'asc'"
+                    (click)="toggleSortMenu($event)">
+                    <span class="label">Sort by: <b>{{ getSortLabel(sortBy()) }}</b></span>
+                    <svg class="chevron" [class.open]="sortMenuOpen()" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor">
+                        <path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+                <div class="dropdown-menu glass-popover" *ngIf="sortMenuOpen()" (click)="$event.stopPropagation()">
+                    <div class="menu-item" (click)="setSortBy('name'); closeAllMenus()"
+                        [class.selected]="sortBy() === 'name'">
+                        <div class="check-box" [class.checked]="sortBy() === 'name'"></div>
+                        <span>Name</span>
+                    </div>
+                    <div class="menu-item" (click)="setSortBy('dateOfJoining'); closeAllMenus()"
+                        [class.selected]="sortBy() === 'dateOfJoining'">
+                        <div class="check-box" [class.checked]="sortBy() === 'dateOfJoining'"></div>
+                        <span>Join Date</span>
+                    </div>
+                    <div class="menu-item" (click)="setSortBy('age'); closeAllMenus()"
+                        [class.selected]="sortBy() === 'age'">
+                        <div class="check-box" [class.checked]="sortBy() === 'age'"></div>
+                        <span>Age</span>
+                    </div>
+                    <div class="menu-item" (click)="setSortBy('performance'); closeAllMenus()"
+                        [class.selected]="sortBy() === 'performance'">
+                        <div class="check-box" [class.checked]="sortBy() === 'performance'"></div>
+                        <span>Performance</span>
+                    </div>
+                    <div class="menu-divider"></div>
+                    <div class="menu-item" (click)="setSortBy('gender', 'desc'); closeAllMenus()"
+                        [class.selected]="sortBy() === 'gender' && sortOrder() === 'desc'">
+                        <div class="check-box" [class.checked]="sortBy() === 'gender' && sortOrder() === 'desc'"></div>
+                        <span>Male (First)</span>
+                    </div>
+                    <div class="menu-item" (click)="setSortBy('gender', 'asc'); closeAllMenus()"
+                        [class.selected]="sortBy() === 'gender' && sortOrder() === 'asc'">
+                        <div class="check-box" [class.checked]="sortBy() === 'gender' && sortOrder() === 'asc'"></div>
+                        <span>Female (First)</span>
+                    </div>
+                    <div class="menu-divider"></div>
+                    <div class="menu-item" (click)="toggleSortOrder()">
+                        <div class="order-toggle-icon" [class.desc]="sortOrder() === 'desc'">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 4h13M3 8h9M3 12h5" />
+                                <path d="M17 12V4m0 0l-3 3m3-3l3 3" />
+                            </svg>
+                        </div>
+                        <span>{{ sortOrder() === 'asc' ? 'Low to High' : 'High to Low' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Divider -->
+            <div class="vertical-divider"></div>
+
+            <!-- Smart Dropdown: Departments -->
+            <div class="smart-dropdown">
+                <button class="dropdown-trigger" [class.active]="selectedDepartments().length > 0"
+                    (click)="toggleDeptMenu($event)">
+                    <span class="label">Departments</span>
+                    <span class="count-badge" *ngIf="selectedDepartments().length > 0">{{ selectedDepartments().length
+                        }}</span>
+                    <svg class="chevron" [class.open]="deptMenuOpen()" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor">
+                        <path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+                <div class="dropdown-menu glass-popover" *ngIf="deptMenuOpen()" (click)="$event.stopPropagation()">
+                    <div class="menu-item" *ngFor="let dept of departments" [class.selected]="isDeptSelected(dept)"
+                        (click)="toggleDepartment(dept)">
+                        <div class="check-box" [class.checked]="isDeptSelected(dept)"></div>
+                        <span>{{ dept }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Smart Dropdown: Status -->
+            <div class="smart-dropdown">
+                <button class="dropdown-trigger" [class.active]="selectedStatuses().length > 0"
+                    (click)="toggleStatusMenu($event)">
+                    <span class="label">Status</span>
+                    <span class="count-badge" *ngIf="selectedStatuses().length > 0">{{ selectedStatuses().length
+                        }}</span>
+                    <svg class="chevron" [class.open]="statusMenuOpen()" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor">
+                        <path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+                <div class="dropdown-menu glass-popover" *ngIf="statusMenuOpen()" (click)="$event.stopPropagation()">
+                    <div class="menu-item" *ngFor="let status of statuses" [class.selected]="isStatusSelected(status)"
+                        (click)="toggleStatus(status)">
+                        <div class="check-box" [class.checked]="isStatusSelected(status)"></div>
+                        <span>{{ status }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ghost Tags Row: Only shows when filters active -->
+        <div class="active-tags-row animate-slideDown"
+            *ngIf="selectedDepartments().length > 0 || selectedStatuses().length > 0 || searchQuery()">
+            <span class="tag-title">Active Filters:</span>
+            <div class="tags-container">
+                <!-- Departments Tags -->
+                <button class="ghost-tag" *ngFor="let dept of selectedDepartments()" (click)="toggleDepartment(dept)">
+                    <span>{{ dept }}</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M18 6L6 18M6 6l12 12" stroke-width="2" />
+                    </svg>
+                </button>
+                <!-- Status Tags -->
+                <div class="ghost-tag" *ngFor="let status of selectedStatuses()">
+                    <span class="dot status"></span>
+                    <span class="text">{{ status }}</span>
+                    <button class="remove" (click)="toggleStatus(status)">✕</button>
+                </div>
+                <button class="clear-all-tag" (click)="clearFilters()">Clear All</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Employee Table -->
+    <div class="table-container" *ngIf="(employees$ | async) as employees">
+        <div class="premium-table-wrapper" *ngIf="employees.length > 0">
+            <table class="employee-table">
+                <thead>
+                    <tr>
+                        <th class="th-avatar"></th>
+                        <th class="th-name">Employee</th>
+                        <th class="th-department">Department</th>
+                        <th class="th-status">Status</th>
+                        <th class="th-gender">Gender</th>
+                        <th class="th-age">Age</th>
+                        <th class="th-joined">Joined</th>
+                        <th class="th-performance">Performance</th>
+                        <th class="th-actions">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let employee of employees" class="employee-row">
+                        <!-- Avatar -->
+                        <td class="td-avatar">
+                            <div class="avatar-circle" [class.online]="employee.status === 'Active'">
+                                <span class="initials">{{ getInitials(employee.name) }}</span>
+                                <div class="status-indicator" [class.active]="employee.status === 'Active'"
+                                    [class.on-leave]="employee.status === 'On Leave'"
+                                    [class.inactive]="employee.status === 'Inactive'">
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Name & Email -->
+                        <td class="td-name">
+                            <div class="name-cell">
+                                <span class="employee-name">{{ employee.name }}</span>
+                                <span class="employee-email">{{ employee.email }}</span>
+                            </div>
+                        </td>
+
+                        <!-- Department -->
+                        <td class="td-department">
+                            <span class="badge badge-department" [attr.data-dept]="employee.department">
+                                {{ employee.department }}
+                            </span>
+                        </td>
+
+                        <!-- Status -->
+                        <td class="td-status">
+                            <span class="badge badge-status" [class.status-active]="employee.status === 'Active'"
+                                [class.status-leave]="employee.status === 'On Leave'"
+                                [class.status-inactive]="employee.status === 'Inactive'">
+                                {{ employee.status }}
+                            </span>
+                        </td>
+
+                        <!-- Gender -->
+                        <td class="td-gender">
+                            <span class="gender-badge" [class.male]="employee.gender === 'Male'"
+                                [class.female]="employee.gender === 'Female'">
+                                {{ employee.gender }}
+                            </span>
+                        </td>
+
+                        <!-- Age -->
+                        <td class="td-age">
+                            <span class="age-text">{{ employee.age }} yrs</span>
+                        </td>
+
+                        <!-- Join Date -->
+                        <td class="td-joined">
+                            <div class="date-cell">
+                                <svg class="calendar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-width="2" />
+                                    <line x1="16" y1="2" x2="16" y2="6" stroke-width="2" />
+                                    <line x1="8" y1="2" x2="8" y2="6" stroke-width="2" />
+                                    <line x1="3" y1="10" x2="21" y2="10" stroke-width="2" />
+                                </svg>
+                                <span>{{ formatDate(employee.dateOfJoining) }}</span>
+                            </div>
+                        </td>
+
+                        <!-- Performance -->
+                        <td class="td-performance">
+                            <span class="performance-text">{{ employee.performance }}%</span>
+                        </td>
+
+                        <!-- Actions -->
+                        <td class="td-actions">
+                            <div class="action-buttons">
+                                <button class="action-btn edit-btn" (click)="onEdit(employee)" title="Edit">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                                            stroke-width="2" />
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+                                            stroke-width="2" />
+                                    </svg>
+                                </button>
+                                <button class="action-btn delete-btn" (click)="onDelete(employee)" title="Delete">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <polyline points="3 6 5 6 21 6" stroke-width="2" />
+                                        <path
+                                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                                            stroke-width="2" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="employees.length === 0" class="empty-state">
+            <div class="empty-icon">👥</div>
+            <h3 class="empty-title">No employees found</h3>
+            <p class="empty-description">
+                {{ searchQuery() || selectedDepartments().length > 0 || selectedStatuses().length > 0
+                ? 'Try adjusting your filters or search query'
+                : 'Get started by adding your first employee' }}
+            </p>
+            <button class="btn-primary" (click)="openAddDialog()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18"
+                    height="18">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Add Employee
+            </button>
+        </div>
+    </div>
+
+    <!-- Edit Dialog -->
+    <div class="dialog-overlay" *ngIf="editDialogOpen()" (click)="onDialogBackdropClick($event)">
+        <div class="edit-dialog" (click)="$event.stopPropagation()">
+            <div class="dialog-header">
+                <div class="dialog-title-section">
+                    <div class="dialog-icon edit-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke-width="2" />
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke-width="2" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="dialog-title">Edit Employee</h2>
+                        <p class="dialog-subtitle">Update employee information</p>
+                    </div>
+                </div>
+                <button class="dialog-close-btn" (click)="closeEditDialog()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M18 6L6 18M6 6l12 12" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="dialog-form">
+                <div class="form-row">
+                    <div class="form-field">
+                        <label class="field-label">Full Name <span class="required">*</span></label>
+                        <input type="text" class="field-input" [(ngModel)]="editForm.name"
+                            placeholder="Enter full name">
+                    </div>
+                    <div class="form-field">
+                        <label class="field-label">Email Address <span class="required">*</span></label>
+                        <input type="email" class="field-input" [(ngModel)]="editForm.email" placeholder="Enter email">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <label class="field-label">Department</label>
+                        <select class="field-select" [(ngModel)]="editForm.department">
+                            <option *ngFor="let dept of departmentOptions" [ngValue]="dept">{{ dept }}</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label class="field-label">Status</label>
+                        <select class="field-select" [(ngModel)]="editForm.status">
+                            <option *ngFor="let status of statusOptions" [ngValue]="status">{{ status }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <label class="field-label">Date of Joining</label>
+                        <input type="date" class="field-input date-input" [(ngModel)]="editForm.dateOfJoining"
+                            [max]="todayDate">
+                    </div>
+                    <div class="form-field">
+                        <label class="field-label">Gender</label>
+                        <select class="field-select" [(ngModel)]="editForm.gender">
+                            <option *ngFor="let g of genderOptions" [ngValue]="g">{{ g }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-field">
+                        <label class="field-label">Age</label>
+                        <input type="number" class="field-input" [(ngModel)]="editForm.age" min="18" max="100">
+                    </div>
+                    <div class="form-field">
+                        <label class="field-label">Performance</label>
+                        <div class="performance-input-group">
+                            <input type="range" class="performance-slider" [(ngModel)]="editForm.performance" min="0"
+                                max="100">
+                            <span class="performance-value">{{ editForm.performance }}%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dialog-actions">
+                <button class="btn-cancel" (click)="closeEditDialog()">Cancel</button>
+                <button class="btn-save" (click)="saveEmployee()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M5 13l4 4L19 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Dialog -->
+    <div class="dialog-overlay" *ngIf="deleteDialogOpen()" (click)="onDialogBackdropClick($event)">
+        <div class="delete-dialog" (click)="$event.stopPropagation()">
+            <div class="delete-icon-wrapper">
+                <div class="delete-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <polyline points="3 6 5 6 21 6" stroke-width="2" />
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                            stroke-width="2" />
+                        <line x1="10" y1="11" x2="10" y2="17" stroke-width="2" />
+                        <line x1="14" y1="11" x2="14" y2="17" stroke-width="2" />
+                    </svg>
+                </div>
+            </div>
+
+            <h2 class="delete-title">Delete Employee?</h2>
+            <p class="delete-message">
+                You are about to permanently delete <strong>{{ employeeToDelete()?.name }}</strong>.
+                This action cannot be undone.
+            </p>
+
+            <div class="verification-section">
+                <label class="verification-label">Type <span class="delete-text">DELETE</span> to confirm</label>
+                <input type="text" class="verification-input" [(ngModel)]="deleteVerification"
+                    placeholder="Type DELETE here" autocomplete="off">
+            </div>
+
+            <div class="delete-actions">
+                <button class="btn-cancel" (click)="closeDeleteDialog()">Cancel</button>
+                <button class="btn-delete" (click)="confirmDelete()"
+                    [class.disabled]="deleteVerification.toLowerCase() !== 'delete'">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <polyline points="3 6 5 6 21 6" stroke-width="2" />
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" stroke-width="2" />
+                    </svg>
+                    Delete Permanently
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Employee Dialog -->
+    <div class="dialog-overlay" *ngIf="addDialogOpen()" (click)="onDialogBackdropClick($event)">
+        <div class="add-dialog" (click)="$event.stopPropagation()">
+            <div class="dialog-header">
+                <div class="dialog-title-section">
+                    <div class="dialog-icon add-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="12" cy="8" r="4" stroke-width="2" />
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke-width="2" />
+                            <path d="M16 3l4 4m0-4l-4 4" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="dialog-title">Add New Employee</h2>
+                        <p class="dialog-subtitle">Fill in the details to add a new team member</p>
+                    </div>
+                </div>
+                <button class="dialog-close-btn" (click)="closeAddDialog()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M18 6L6 18M6 6l12 12" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="dialog-form add-form">
+                <!-- Row 1: Name & Email -->
+                <div class="form-row">
+                    <div class="form-field" [class.has-error]="formErrors()['name']">
+                        <label class="field-label">Full Name <span class="required">*</span></label>
+                        <input type="text" class="field-input" [(ngModel)]="addForm.name"
+                            placeholder="Enter full name (min 3 characters)">
+                        <span class="field-error" *ngIf="formErrors()['name']">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <circle cx="12" cy="12" r="10" stroke-width="2" />
+                                <line x1="12" y1="8" x2="12" y2="12" stroke-width="2" />
+                                <line x1="12" y1="16" x2="12.01" y2="16" stroke-width="2" />
+                            </svg>
+                            {{ formErrors()['name'] }}
+                        </span>
+                    </div>
+                    <div class="form-field" [class.has-error]="formErrors()['email']">
+                        <label class="field-label">Email Address <span class="required">*</span></label>
+                        <input type="email" class="field-input" [(ngModel)]="addForm.email"
+                            placeholder="employee@company.com">
+                        <span class="field-error" *ngIf="formErrors()['email']">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <circle cx="12" cy="12" r="10" stroke-width="2" />
+                                <line x1="12" y1="8" x2="12" y2="12" stroke-width="2" />
+                                <line x1="12" y1="16" x2="12.01" y2="16" stroke-width="2" />
+                            </svg>
+                            {{ formErrors()['email'] }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Row 2: Department & Date of Joining -->
+                <div class="form-row">
+                    <div class="form-field" [class.has-error]="formErrors()['department']">
+                        <label class="field-label">Department <span class="required">*</span></label>
+                        <select class="field-select" [(ngModel)]="addForm.department">
+                            <option value="" disabled>Select Department</option>
+                            <option *ngFor="let dept of departmentOptions" [ngValue]="dept">{{ dept }}</option>
+                        </select>
+                        <span class="field-error" *ngIf="formErrors()['department']">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <circle cx="12" cy="12" r="10" stroke-width="2" />
+                                <line x1="12" y1="8" x2="12" y2="12" stroke-width="2" />
+                                <line x1="12" y1="16" x2="12.01" y2="16" stroke-width="2" />
+                            </svg>
+                            {{ formErrors()['department'] }}
+                        </span>
+                    </div>
+                    <div class="form-field" [class.has-error]="formErrors()['dateOfJoining']">
+                        <label class="field-label">Date of Joining <span class="required">*</span></label>
+                        <input type="date" class="field-input date-input" [(ngModel)]="addForm.dateOfJoining"
+                            [max]="todayDate">
+                        <span class="field-error" *ngIf="formErrors()['dateOfJoining']">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <circle cx="12" cy="12" r="10" stroke-width="2" />
+                                <line x1="12" y1="8" x2="12" y2="12" stroke-width="2" />
+                                <line x1="12" y1="16" x2="12.01" y2="16" stroke-width="2" />
+                            </svg>
+                            {{ formErrors()['dateOfJoining'] }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Row 3: Gender & Age -->
+                <div class="form-row">
+                    <div class="form-field" [class.has-error]="formErrors()['gender']">
+                        <label class="field-label">Gender <span class="required">*</span></label>
+                        <select class="field-select" [(ngModel)]="addForm.gender">
+                            <option value="" disabled>Select Gender</option>
+                            <option *ngFor="let g of genderOptions" [ngValue]="g">{{ g }}</option>
+                        </select>
+                        <span class="field-error" *ngIf="formErrors()['gender']">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <circle cx="12" cy="12" r="10" stroke-width="2" />
+                                <line x1="12" y1="8" x2="12" y2="12" stroke-width="2" />
+                                <line x1="12" y1="16" x2="12.01" y2="16" stroke-width="2" />
+                            </svg>
+                            {{ formErrors()['gender'] }}
+                        </span>
+                    </div>
+                    <div class="form-field" [class.has-error]="formErrors()['age']">
+                        <label class="field-label">Age <span class="required">*</span></label>
+                        <input type="number" class="field-input" [(ngModel)]="addForm.age" min="18" max="100"
+                            placeholder="Enter age">
+                        <span class="field-error" *ngIf="formErrors()['age']">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <circle cx="12" cy="12" r="10" stroke-width="2" />
+                                <line x1="12" y1="8" x2="12" y2="12" stroke-width="2" />
+                                <line x1="12" y1="16" x2="12.01" y2="16" stroke-width="2" />
+                            </svg>
+                            {{ formErrors()['age'] }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Row 4: Status & Performance -->
+                <div class="form-row">
+                    <div class="form-field">
+                        <label class="field-label">Status</label>
+                        <select class="field-select" [(ngModel)]="addForm.status">
+                            <option *ngFor="let status of statusOptions" [ngValue]="status">{{ status }}</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label class="field-label">Performance</label>
+                        <div class="performance-input-group">
+                            <input type="range" class="performance-slider" [(ngModel)]="addForm.performance" min="0"
+                                max="100">
+                            <span class="performance-value">{{ addForm.performance }}%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dialog-actions">
+                <button class="btn-cancel" (click)="closeAddDialog()">Cancel</button>
+                <button class="btn-save btn-add" (click)="submitAddEmployee()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M12 5v14m-7-7h14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    Add Employee
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Premium Toast Notification System -->
+    <div class="premium-toast-container" [class.show]="notification().show">
+        <!-- Backdrop Glow Effect -->
+        <div class="toast-glow" [class.success]="notification().type === 'success'"
+            [class.error]="notification().type === 'error'" [class.warning]="notification().type === 'warning'"
+            [class.info]="notification().type === 'info'">
+        </div>
+
+        <!-- Main Toast -->
+        <div class="premium-toast" [class.success]="notification().type === 'success'"
+            [class.error]="notification().type === 'error'" [class.warning]="notification().type === 'warning'"
+            [class.info]="notification().type === 'info'">
+
+            <!-- Animated Particles for Success -->
+            <div class="toast-particles" *ngIf="notification().type === 'success'">
+                <span class="particle"></span>
+                <span class="particle"></span>
+                <span class="particle"></span>
+                <span class="particle"></span>
+                <span class="particle"></span>
+                <span class="particle"></span>
+                <span class="particle"></span>
+                <span class="particle"></span>
+            </div>
+
+            <!-- Icon Container with Animation -->
+            <div class="toast-icon-container">
+                <div class="icon-ring"></div>
+                <div class="toast-icon">
+                    <!-- Success Icon - Animated Checkmark -->
+                    <svg *ngIf="notification().type === 'success'" class="icon-success" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" class="icon-circle" />
+                        <path d="M8 12l2.5 2.5L16 9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                            stroke-linejoin="round" class="icon-check" />
+                    </svg>
+                    <!-- Error Icon - Animated X -->
+                    <svg *ngIf="notification().type === 'error'" class="icon-error" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" class="icon-circle" />
+                        <path d="M15 9l-6 6M9 9l6 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                            class="icon-x" />
+                    </svg>
+                    <!-- Warning Icon -->
+                    <svg *ngIf="notification().type === 'warning'" class="icon-warning" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2L2 20h20L12 2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"
+                            class="icon-triangle" />
+                        <path d="M12 9v4M12 17h.01" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                            class="icon-exclaim" />
+                    </svg>
+                    <!-- Info Icon -->
+                    <svg *ngIf="notification().type === 'info'" class="icon-info" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" class="icon-circle" />
+                        <path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                            class="icon-i" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="toast-content">
+                <div class="toast-header">
+                    <span class="toast-title">{{ notification().title }}</span>
+                    <span class="toast-badge" [class.success]="notification().type === 'success'"
+                        [class.error]="notification().type === 'error'"
+                        [class.warning]="notification().type === 'warning'"
+                        [class.info]="notification().type === 'info'">
+                        {{ notification().type === 'success' ? '✓ Success' :
+                        notification().type === 'error' ? '✕ Error' :
+                        notification().type === 'warning' ? '⚠ Attention' : 'ℹ Info' }}
+                    </span>
+                </div>
+                <p class="toast-message">{{ notification().message }}</p>
+            </div>
+
+            <!-- Close Button -->
+            <button class="toast-close" (click)="dismissNotification()" aria-label="Close notification">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M18 6L6 18M6 6l12 12" stroke-width="2" stroke-linecap="round" />
+                </svg>
+            </button>
+
+            <!-- Animated Progress Bar -->
+            <div class="toast-progress-track">
+                <div class="toast-progress-bar" [style.width.%]="notification().progress">
+                    <div class="progress-glow"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
