@@ -7,7 +7,11 @@
 [![Vite](https://img.shields.io/badge/Vite-6.0.0-646cff.svg?style=flat&logo=vite)](https://vitejs.dev/)
 [![Status](https://img.shields.io/badge/Status-Active_Development-brightgreen.svg?style=flat)]()
 
-## 📖 Overview
+## � Live Demo
+
+[**View Live Application**](https://employee-dashboard-ivory.vercel.app/employees)
+
+## �📖 Overview
 
 The **Employee Dashboard** is a state-of-the-art web application designed to manage global workforce data with a focus on **User Experience (UX)** and **Visual Aesthetics**. It transitions away from traditional, clunky admin panels to a sleek, **glassmorphism-inspired** interface that is both functional and beautiful.
 
