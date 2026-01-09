@@ -9,6 +9,7 @@
 [![Vite](https://img.shields.io/badge/Vite-5.0-646cff.svg?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Security](https://img.shields.io/badge/Security-AES--GCM-success?style=for-the-badge&logo=security&logoColor=white)]()
 [![License](https://img.shields.io/badge/License-Proprietary-red.svg?style=for-the-badge)]()
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Visit_App-2ea44f?style=for-the-badge&logo=vercel&logoColor=white)](https://employee-dashboard-ivory.vercel.app/)
 
 ---
 
@@ -31,49 +32,60 @@ The system prioritizes **Data Integrity** and **Security**, utilizing banking-gr
 The application follows a strict **Feature-Based Modular Architecture**. This design pattern ensures separation of concerns, maintainability, and scalability.
 
 ```mermaid
-graph TD
-    %% Nodes
-    User((User Action))
+flowchart TD
+    %% Nodes with Icons & Labels
+    User(("👤 User Action"))
     
-    subgraph UI [Presentation Layer]
-        Layout[Main Layout]
-        Dash[Dashboard]
-        List[Employee List]
-        Form[Employee Form]
+    subgraph UI ["🖥️ Presentation Layer"]
+        direction TB
+        Layout["📐 Main Layout"]
+        Dash["📊 Dashboard Component"]
+        List["👥 Employee List Component"]
+        Form["📝 Employee Form Modal"]
     end
     
-    subgraph Core [Business Logic]
-        Service[Employee Service]
-        State[Signals State]
+    subgraph Core ["🧠 Business Logic"]
+        direction TB
+        Service["⚙️ Employee Service"]
+        State["📡 Reactive Signals State"]
     end
     
-    subgraph Data [Persistence & Security]
-        Storage[Storage Service]
-        Crypto[Crypto Service (AES-GCM)]
-        DB[(Local Storage)]
+    subgraph Data ["💾 Persistence & Security"]
+        direction TB
+        Storage["📦 Storage Service"]
+        Crypto["🔐 Crypto Service (AES-GCM)"]
+        DB[("🗄️ Local Storage")]
     end
 
-    %% Flow
-    User --> Layout
+    %% Relationships
+    User ==> Layout
     Layout --> Dash
     Layout --> List
     List -.-> Form
     
-    Dash -->|Reads| Service
-    List -->|Reads| Service
-    Form -->|Writes| Service
+    Dash -->|"Reads Data"| Service
+    List -->|"Reads Data"| Service
+    Form -->|"Submits Data"| Service
     
-    Service <-->|Reactive State| State
-    Service -->|Persist| Storage
-    Storage <-->|Encrypt/Decrypt| Crypto
-    Crypto -->|Save Encrypted| DB
+    Service <==>|"Updates"| State
+    Service -->|"Persists"| Storage
+    Storage <==>|"Encrypts/Decrypts"| Crypto
+    Crypto ==>|"Saves"| DB
     
-    %% Classic Professional Styling (High Contrast)
-    classDef nodeStyle fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000;
-    classDef dbStyle fill:#f0f0f0,stroke:#000000,stroke-width:2px,stroke-dasharray: 5 5,color:#000000;
+    %% Professional Styling
+    classDef default fill:#ffffff,stroke:#333333,stroke-width:1px,color:#000000;
     
-    class User,Layout,Dash,List,Form,Service,State,Storage,Crypto nodeStyle;
+    classDef uiLayer fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0c4a6e;
+    classDef coreLayer fill:#f3e8ff,stroke:#9333ea,stroke-width:2px,color:#581c87;
+    classDef dataLayer fill:#ecfdf5,stroke:#059669,stroke-width:2px,color:#064e3b;
+    classDef dbStyle fill:#f1f5f9,stroke:#475569,stroke-width:2px,stroke-dasharray: 5 5,color:#0f172a;
+    
+    %% Apply Styles
+    class Layout,Dash,List,Form uiLayer;
+    class Service,State coreLayer;
+    class Storage,Crypto dataLayer;
     class DB dbStyle;
+    class User default;
 ```
 
 ---
