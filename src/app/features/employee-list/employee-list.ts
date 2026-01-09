@@ -84,11 +84,11 @@ export class EmployeeList {
     message: '',
     progress: 100
   });
-  private notificationTimer: any = null;
-  private progressTimer: any = null;
+  private notificationTimer: number | undefined;
+  private progressTimer: number | undefined;
 
   departments = Object.values(Department);
-  statuses = ['Active', 'On Leave', 'Inactive'];
+  statuses: EmployeeStatus[] = [EmployeeStatus.Active, EmployeeStatus.OnLeave, EmployeeStatus.Inactive];
   departmentOptions = Object.values(Department);
   statusOptions = Object.values(EmployeeStatus);
 
@@ -126,7 +126,7 @@ export class EmployeeList {
     this.applyFilters();
   }
 
-  toggleDepartment(dept: any): void {
+  toggleDepartment(dept: Department): void {
     const d = dept as Department;
     const current = this.selectedDepartments();
     const index = current.indexOf(d);
@@ -138,7 +138,7 @@ export class EmployeeList {
     this.applyFilters();
   }
 
-  toggleStatus(status: any): void {
+  toggleStatus(status: EmployeeStatus): void {
     const s = status as EmployeeStatus;
     const current = this.selectedStatuses();
     const index = current.indexOf(s);
@@ -404,7 +404,7 @@ export class EmployeeList {
   async exportCSV(): Promise<void> {
     try {
       const success = await this.employeeService.exportToCSV();
-      console.log('Export result:', success);
+      // console.log('Export result:', success);
 
       if (success === true) {
         this.showNotification('success', 'Export Complete!', 'Your employee data has been saved successfully.');

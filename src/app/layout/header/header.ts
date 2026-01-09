@@ -15,6 +15,6 @@ export class Header {
   onSearch(event: Event): void {
     // Placeholder for global search
     const query = (event.target as HTMLInputElement).value;
-    console.log('Global search:', query);
+    // console.log('Global search:', query);
   }
 }
