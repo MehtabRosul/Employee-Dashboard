@@ -32,31 +32,48 @@ The application follows a strict **Feature-Based Modular Architecture**. This de
 
 ```mermaid
 graph TD
-    User([👤 User]) -->|Interacts| UI[🖥️ Main Layout]
+    %% Nodes
+    User((User Action))
     
-    subgraph "Presentation Layer"
-        UI -->|Routes| Dashboard[📊 Dashboard Component]
-        UI -->|Routes| EmpList[👥 Employee List Component]
-        EmpList -->|Opens| Modal[📝 Employee Form Modal]
+    subgraph UI [Presentation Layer]
+        Layout[Main Layout]
+        Dash[Dashboard]
+        List[Employee List]
+        Form[Employee Form]
+    end
+    
+    subgraph Core [Business Logic]
+        Service[Employee Service]
+        State[Signals State]
+    end
+    
+    subgraph Data [Persistence & Security]
+        Storage[Storage Service]
+        Crypto[Crypto Service (AES-GCM)]
+        DB[(Local Storage)]
     end
 
-    subgraph "Core Layer (State & Logic)"
-        Dashboard -->|Subscribes| EmpService[⚙️ Employee Service]
-        EmpList -->|Subscribes| EmpService
-        Modal -->|Submits| EmpService
-        
-        EmpService -->|Deep Readonly| Signals((📡 Signals State))
-    end
-
-    subgraph "Data Persistence Layer"
-        EmpService -->|Persist| Storage[💾 Storage Service]
-        Storage -->|Encrypt/Decrypt| Crypto[🔐 Crypto Service]
-        Crypto -->|AES-GCM| LocalStorage[(🗄️ Browser Storage)]
-    end
-
-    style EmpService fill:#f9f,stroke:#333,stroke-width:2px
-    style Crypto fill:#9f9,stroke:#333,stroke-width:2px
-    style Signals fill:#bbf,stroke:#333,stroke-width:2px
+    %% Flow
+    User --> Layout
+    Layout --> Dash
+    Layout --> List
+    List -.-> Form
+    
+    Dash -->|Reads| Service
+    List -->|Reads| Service
+    Form -->|Writes| Service
+    
+    Service <-->|Reactive State| State
+    Service -->|Persist| Storage
+    Storage <-->|Encrypt/Decrypt| Crypto
+    Crypto -->|Save Encrypted| DB
+    
+    %% Classic Professional Styling (High Contrast)
+    classDef nodeStyle fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000;
+    classDef dbStyle fill:#f0f0f0,stroke:#000000,stroke-width:2px,stroke-dasharray: 5 5,color:#000000;
+    
+    class User,Layout,Dash,List,Form,Service,State,Storage,Crypto nodeStyle;
+    class DB dbStyle;
 ```
 
 ---
@@ -114,17 +131,32 @@ Data persistence is handled by a custom `StorageService` that wraps the browser'
 
 ---
 
-## 🎨 Visual Showcase
+## 📸 Visual Showcase
 
 Experience the dual-themed interface designed for clarity and aesthetics.
 
-> **Dashboard Overview**
-> *Real-time metrics visualization with smooth transitions.*
-> ![Dashboard](./src/assets/screenshots/dashboard_dark.png)
+### 📊 Dashboard Overview
+The command center of the application. Visualizes key workforce metrics with real-time stats and smooth animations.
 
-> **Employee Management**
-> *High-density grid with advanced filtering and instant search.*
-> ![Employee List](./src/assets/screenshots/employee_dark.png)
+| **Dark Mode** | **Light Mode** |
+|:---:|:---:|
+| ![Dashboard Dark](./src/assets/screenshots/dashboard_dark.png) | ![Dashboard Light](./src/assets/screenshots/dashboard_light.png) |
+
+### 👥 Global Workforce List
+A powerful, high-density data table with advanced filtering and search capabilities.
+
+| **Dark Mode** | **Light Mode** |
+|:---:|:---:|
+| ![Employee List Dark](./src/assets/screenshots/employee_dark.png) | ![Employee List Light](./src/assets/screenshots/employee_light.png) |
+
+### ⚡ Seamless Actions
+Intuitive modals and forms for managing employee data without losing context.
+
+| **Add Employee** | **Edit Details** | **Delete Confirmation** |
+|:---:|:---:|:---:|
+| ![Add Employee](./src/assets/screenshots/add_new_employee.png) | ![Edit Details](./src/assets/screenshots/employee_edit_dark.png) | ![Delete Confirmation](./src/assets/screenshots/delete_employee_light.png) |
+
+> *All interactions feature glassmorphism backdrops and micro-interactions for a premium feel.*
 
 ---
 
