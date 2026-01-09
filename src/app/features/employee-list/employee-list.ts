@@ -1,6 +1,7 @@
-import { Component, signal, computed, HostListener, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
+import { Component, signal, computed, HostListener, ChangeDetectionStrategy, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { EmployeeService } from '../../core/services/employee.service';
 import { Employee, Department, EmployeeStatus, EmployeeFilters, SortField } from '../../core/models/employee.model';
 import { Observable } from 'rxjs';
@@ -66,7 +67,8 @@ export class EmployeeList {
   };
   formErrors = signal<{ [key: string]: string }>({});
   genderOptions = ['Male', 'Female', 'Other'];
-  todayDate = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD format handling timezone correctly
+  todayDate = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+  minDate = new Date(new Date().setFullYear(new Date().getFullYear() - 40)).toLocaleDateString('en-CA'); // 40 years ago
 
   // Notification State
   notification = signal<{
@@ -97,8 +99,18 @@ export class EmployeeList {
     if (this.progressTimer) clearInterval(this.progressTimer);
   }
 
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
   ngOnInit(): void {
     this.employees$ = this.employeeService.filteredEmployees$;
+
+    // Check for action query param to auto-open add dialog
+    this.route.queryParams.subscribe(params => {
+      if (params['action'] === 'add') {
+        this.openAddDialog();
+      }
+    });
   }
 
   isDeptSelected(dept: Department): boolean {
@@ -419,6 +431,12 @@ export class EmployeeList {
   closeAddDialog(): void {
     this.addDialogOpen.set(false);
     this.resetAddForm();
+    // Clear the query param
+    this.router.navigate([], {
+      queryParams: { action: null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
   }
 
   resetAddForm(): void {
@@ -426,7 +444,7 @@ export class EmployeeList {
       name: '',
       email: '',
       department: '',
-      dateOfJoining: '',
+      dateOfJoining: this.todayDate, // Auto-detect present day
       gender: '',
       age: null,
       status: EmployeeStatus.Active,
@@ -438,20 +456,29 @@ export class EmployeeList {
   validateAddForm(): boolean {
     const errors: { [key: string]: string } = {};
 
-    // Name validation (min 3 characters)
+    // Name validation (Full Name required: at least 2 words, no numbers)
+    // Allows letters, spaces, and dots (for initials like "P.").
+    const nameRegex = /^[a-zA-Z\s.]+$/;
+    const nameParts = this.addForm.name.trim().split(/\s+/);
+
     if (!this.addForm.name.trim()) {
-      errors['name'] = 'Name is required';
+      errors['name'] = 'Full Name is required';
+    } else if (!nameRegex.test(this.addForm.name.trim())) {
+      errors['name'] = 'Name must contain only letters, spaces, and dots (no numbers)';
+    } else if (nameParts.length < 2) {
+      errors['name'] = 'Please enter your full name (First & Last Name)';
     } else if (this.addForm.name.trim().length < 3) {
-      errors['name'] = 'Name must be at least 3 characters';
+      errors['name'] = 'Name must be at least 3 characters long';
     }
 
     // Email validation
     if (!this.addForm.email.trim()) {
       errors['email'] = 'Email is required';
     } else {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      // Stricter email regex: requires local part, @, domain, dot, and TLD (min 2 chars)
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
       if (!emailRegex.test(this.addForm.email)) {
-        errors['email'] = 'Please enter a valid email address';
+        errors['email'] = 'Please enter a valid, verified email address';
       } else if (this.employeeService.emailExists(this.addForm.email)) {
         errors['email'] = 'This email is already registered';
       }
@@ -466,9 +493,13 @@ export class EmployeeList {
     if (!this.addForm.dateOfJoining) {
       errors['dateOfJoining'] = 'Date of joining is required';
     } else {
-      const joinDate = new Date(this.addForm.dateOfJoining);
+      const [year, month, day] = this.addForm.dateOfJoining.split('-').map(Number);
+      const joinDate = new Date(year, month - 1, day); // Create local date object
+      joinDate.setHours(0, 0, 0, 0); // Normalize to midnight
+
       const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0); // Normalize today to midnight
+
       if (joinDate > today) {
         errors['dateOfJoining'] = 'Date cannot be in the future';
       }
