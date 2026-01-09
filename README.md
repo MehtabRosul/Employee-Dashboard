@@ -229,5 +229,5 @@ We welcome contributions from the engineering community.
 
 ## 📄 License & Proprietary Rights
 
-**© 2026 Vintage Technologies.**
+**© 2026 Employee Management System.**
 All rights reserved. This software is proprietary and confidential. Unauthorized copying, distribution, or modification is strictly prohibited.
