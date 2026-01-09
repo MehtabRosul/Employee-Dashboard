@@ -9,7 +9,7 @@
 
 ## � Live Demo
 
-[**View Live Application**](https://employee-dashboard-ivory.vercel.app/employees)
+[**View Live Application**](https://employee-dashboard-ivory.vercel.app/)
 
 ## �📖 Overview
 
