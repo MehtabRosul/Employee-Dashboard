@@ -238,26 +238,104 @@ npm run test
 
 ## 🧩 Problem-Solving Approach
 
-This project was built with a focus on solving real-world challenges in employee management systems.
+This project was engineered with a focus on demonstrating mastery across core frontend development competencies.
 
-### 🎯 Design Philosophy
--   **Security-First Mindset**: The primary challenge was ensuring sensitive employee data remains protected even when using client-side storage. This was solved by implementing **AES-GCM 256-bit encryption** using the Web Crypto API—making the stored data completely unreadable without the derived key.
--   **Performance Optimization**: Traditional Angular applications suffer from excessive change detection. By adopting **Angular Signals**, the application achieves fine-grained reactivity, updating only what's necessary and eliminating performance bottlenecks.
--   **Seamless User Experience**: The challenge of managing complex data without overwhelming users was addressed through **glassmorphism design**, intuitive modals, and micro-animations that guide user actions naturally.
+---
 
-### 🔧 Technical Challenges Overcome
-| Challenge | Solution |
+### 🅰️ Angular Knowledge
+
+**Components, Modules, Services, Signals & Forms** — The application showcases deep Angular expertise:
+
+| Concept | Implementation |
 |:---|:---|
-| Secure client-side data persistence | Implemented AES-GCM encryption with PBKDF2 key derivation (100k iterations) |
-| Avoiding bundle bloat | Applied **lazy loading** at the route level for feature modules |
-| Maintaining type safety across the app | Enforced strict TypeScript with custom interfaces and enums |
-| Responsive, premium UI across devices | Built a custom glassmorphism design system with CSS variables |
-| Efficient data filtering & sorting | Utilized reactive **computed signals** for derived state |
+| **Standalone Components** | Every component uses the modern `standalone: true` pattern, eliminating NgModule boilerplate. |
+| **Feature Modules** | Dashboard, Employee List, and Employee Form are self-contained feature units with lazy loading. |
+| **Services & DI** | `EmployeeService`, `StorageService`, and `CryptoService` are injected via Angular's dependency injection system. |
+| **Reactive Forms** | The employee form uses `FormBuilder` with custom validators for name patterns, email format, and date constraints. |
+| **Angular Signals** | All state management uses `signal()`, `computed()`, and `effect()` for fine-grained reactivity without RxJS complexity. |
+| **Two-Way Binding** | Search and filter controls leverage `[(ngModel)]` with debounced inputs for real-time feedback. |
+
+---
+
+### 🟨 JavaScript Skills
+
+**Array Methods, Sorting, Filtering & Validation** — Pure JavaScript mastery powers the data layer:
+
+-   **Filtering**: `Array.filter()` dynamically filters employees by department, status, and gender based on user selections.
+-   **Sorting**: `Array.sort()` with custom comparators handles ascending/descending sorts on name, salary, and join date.
+-   **Searching**: Case-insensitive search using `String.toLowerCase()` and `includes()` across multiple employee fields.
+-   **Mapping**: `Array.map()` transforms employee data for CSV export and dashboard aggregations.
+-   **Reducing**: `Array.reduce()` calculates totals like average salary and department counts for KPI cards.
+-   **Validation**: Custom regex patterns (`/^[A-Za-z\s]+$/` for names, email RFC 5322 patterns) ensure data integrity.
+
+---
+
+### 🧹 Code Quality
+
+**Readability, Reusability & Modularity** — Production-grade code standards:
+
+| Principle | How It's Applied |
+|:---|:---|
+| **Single Responsibility** | Each service handles one concern: `CryptoService` (encryption), `StorageService` (persistence), `EmployeeService` (business logic). |
+| **DRY (Don't Repeat Yourself)** | Shared validators, pipes, and utility functions are centralized in the `core/` and `shared/` directories. |
+| **Strict Typing** | TypeScript `interfaces` and `enums` (`Employee`, `EmployeeStatus`, `Department`) enforce type safety everywhere. |
+| **Clean Imports** | Barrel exports (`index.ts`) in each module simplify import statements across the codebase. |
+| **Consistent Naming** | Files follow Angular conventions: `*.component.ts`, `*.service.ts`, `*.pipe.ts`. |
+| **No Console Logs** | All debug statements removed; production-ready codebase. |
+
+---
+
+### 🎨 UI/UX Design
+
+**Responsiveness, User Experience & Attention to Detail** — A premium, polished interface:
+
+-   **Glassmorphism Aesthetic**: Frosted glass effects with `backdrop-filter: blur()` create depth and visual hierarchy.
+-   **Dual Theme Support**: Seamless dark/light mode toggle with CSS custom properties for instant switching.
+-   **Micro-Animations**: Hover effects, button ripples, and modal transitions provide tactile feedback.
+-   **Mobile-First Responsive**: Flexbox and CSS Grid layouts adapt flawlessly from 320px phones to 4K displays.
+-   **Accessibility Considerations**: Proper contrast ratios, focus states, and semantic HTML structure.
+-   **Empty States**: Friendly illustrations and CTAs when no employees exist, guiding users to add data.
+-   **Loading States**: Skeleton loaders and spinners prevent jarring content shifts.
+
+---
+
+### 🧠 Problem Solving
+
+**Persistence, Search, Validations & Edge Cases** — Thoughtful solutions to real requirements:
+
+| Requirement | Solution |
+|:---|:---|
+| **Data Persistence** | Encrypted localStorage ensures data survives page refreshes and browser restarts. |
+| **Real-Time Search** | Debounced search input with computed signals updates results instantly without API calls. |
+| **Form Validations** | Multi-layer validation: required fields, pattern matching, date range constraints, and duplicate email prevention. |
+| **Bulk Operations** | CSV export with proper escaping handles special characters, commas, and newlines in data. |
+| **State Sync** | Signals automatically propagate changes from forms to lists to dashboard KPIs in real-time. |
+| **Error Handling** | Try-catch blocks with graceful fallbacks prevent crashes from corrupted storage data. |
+
+---
+
+### 🔐 Crypto Encryption
+
+**Why AES-GCM Over Plain LocalStorage?** — Security as a first-class citizen:
+
+Employee data contains **Personally Identifiable Information (PII)**: names, emails, salaries, and contact details. Storing this in plain `localStorage` would be a critical vulnerability.
+
+**Our Implementation:**
+-   **Algorithm**: AES-GCM 256-bit via the native **Web Crypto API** (no external libraries).
+-   **Key Derivation**: PBKDF2 with **100,000 iterations**, combining a secret, user agent, and unique salt.
+-   **Random IVs**: Every encryption uses a fresh Initialization Vector, preventing pattern analysis.
+-   **Authenticated Encryption**: AES-GCM provides both confidentiality AND integrity verification.
+
+**Result**: Even if an attacker accesses localStorage via XSS or DevTools, they see only **unreadable ciphertext**—the data is useless without the derived key.
+
+---
 
 ### 📐 Architectural Decisions
+
 1.  **Feature-Based Modularity**: Each feature (Dashboard, Employee List, Form) is self-contained, promoting separation of concerns and testability.
 2.  **Service Layer Abstraction**: All business logic resides in services (`EmployeeService`, `StorageService`, `CryptoService`), keeping components lean and presentation-focused.
 3.  **Reactive State with Signals**: Moved away from RxJS observables for local state, embracing Angular Signals for simpler, more predictable reactivity.
+4.  **Lazy Loading**: Route-level code splitting ensures users only download the code they need, reducing initial bundle size.
 
 ---
 
