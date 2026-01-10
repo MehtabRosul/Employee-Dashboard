@@ -65,8 +65,23 @@ export class EmployeeService {
 
     /**
      * Add new employee
+     * @throws Error if employee with same name or email already exists
      */
     addEmployee(dto: CreateEmployeeDto): Employee {
+        // CRITICAL: Service-level duplicate prevention as final safety layer
+        if (this.nameExists(dto.name)) {
+            throw new Error('Name already taken');
+        }
+        if (this.emailExists(dto.email)) {
+            throw new Error('Email already in use');
+        }
+
+        // CRITICAL: Service-level age validation as final safety layer
+        const age = Number(dto.age);
+        if (isNaN(age) || age < 18 || age > 59) {
+            throw new Error('Age must be 18-59 years');
+        }
+
         const newEmployee: Employee = {
             id: this.generateId(),
             name: this.sanitizeInput(dto.name),
@@ -89,6 +104,7 @@ export class EmployeeService {
 
     /**
      * Update existing employee
+     * @throws Error if trying to update to an existing name or email
      */
     updateEmployee(id: string, dto: Partial<CreateEmployeeDto>): Employee | null {
         const employees = this.employeesSubject.value;
@@ -96,6 +112,22 @@ export class EmployeeService {
 
         if (index === -1) {
             return null;
+        }
+
+        // CRITICAL: Validate no duplicate name/email (excluding current employee)
+        if (dto.name && this.nameExists(dto.name, id)) {
+            throw new Error('Name already taken');
+        }
+        if (dto.email && this.emailExists(dto.email, id)) {
+            throw new Error('Email already in use');
+        }
+
+        // CRITICAL: Service-level age validation as final safety layer
+        if (dto.age !== undefined) {
+            const age = Number(dto.age);
+            if (isNaN(age) || age < 18 || age > 59) {
+                throw new Error('Age must be 18-59 years');
+            }
         }
 
         const updatedEmployee: Employee = {
@@ -261,11 +293,43 @@ export class EmployeeService {
     }
 
     /**
+     * Normalize name for consistent comparison
+     * Handles: case-insensitivity, whitespace normalization, hyphen/apostrophe removal, diacritics
+     */
+    private normalizeName(name: string): string {
+        return name
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, ' ')          // Collapse multiple spaces to single
+            .replace(/['\-]/g, '')          // Remove hyphens and apostrophes
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, ''); // Remove diacritics (accents)
+    }
+
+    /**
+     * Normalize email for consistent comparison
+     */
+    private normalizeEmail(email: string): string {
+        return email.toLowerCase().trim();
+    }
+
+    /**
+     * Check if name exists (case-insensitive, whitespace-normalized)
+     */
+    nameExists(name: string, excludeId?: string): boolean {
+        const normalizedInput = this.normalizeName(name);
+        return this.employeesSubject.value.some(
+            emp => this.normalizeName(emp.name) === normalizedInput && emp.id !== excludeId
+        );
+    }
+
+    /**
      * Check if email exists
      */
     emailExists(email: string, excludeId?: string): boolean {
+        const normalizedInput = this.normalizeEmail(email);
         return this.employeesSubject.value.some(
-            emp => emp.email.toLowerCase() === email.toLowerCase() && emp.id !== excludeId
+            emp => this.normalizeEmail(emp.email) === normalizedInput && emp.id !== excludeId
         );
     }
 

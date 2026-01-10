@@ -102,6 +102,57 @@ export function uniqueEmailValidator(
 }
 
 /**
+ * Validate that name is unique (async validator)
+ * Uses case-insensitive and whitespace-normalized comparison
+ */
+export function uniqueNameValidator(
+    employeeService: EmployeeService,
+    currentEmployeeId?: string
+): AsyncValidatorFn {
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+        if (!control.value) {
+            return of(null);
+        }
+
+        // Use timer as debounce to avoid excessive checks on every keystroke
+        return timer(500).pipe(
+            switchMap(() => {
+                const exists = employeeService.nameExists(control.value, currentEmployeeId);
+                return of(exists ? { nameExists: true } : null);
+            }),
+            take(1)
+        );
+    };
+}
+
+/**
+ * Validate age (must be between 18 and 59 - working age range)
+ */
+export function ageValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+        if (!control.value && control.value !== 0) {
+            return null; // Let required validator handle empty
+        }
+
+        const value = Number(control.value);
+
+        if (isNaN(value)) {
+            return { ageInvalid: true };
+        }
+
+        if (value < 18) {
+            return { ageTooYoung: { min: 18, actual: value } };
+        }
+
+        if (value > 59) {
+            return { ageTooOld: { max: 59, actual: value } };
+        }
+
+        return null;
+    };
+}
+
+/**
  * Validate performance (0-100)
  */
 export function performanceValidator(): ValidatorFn {
@@ -177,7 +228,11 @@ export function getErrorMessage(errors: ValidationErrors | null, fieldName: stri
     }
 
     if (errors['emailExists']) {
-        return 'This email is already registered';
+        return 'Email already in use';
+    }
+
+    if (errors['nameExists']) {
+        return 'Name already taken';
     }
 
     if (errors['futureDate']) {
@@ -191,6 +246,19 @@ export function getErrorMessage(errors: ValidationErrors | null, fieldName: stri
     if (errors['outOfRange']) {
         const { min, max } = errors['outOfRange'];
         return `${fieldName} must be between ${min} and ${max}`;
+    }
+
+    // Age-specific validation messages
+    if (errors['ageTooYoung']) {
+        return 'Minimum age is 18 years';
+    }
+
+    if (errors['ageTooOld']) {
+        return 'Maximum age is 59 years';
+    }
+
+    if (errors['ageInvalid']) {
+        return 'Enter a valid age';
     }
 
     if (errors['specialCharacters']) {

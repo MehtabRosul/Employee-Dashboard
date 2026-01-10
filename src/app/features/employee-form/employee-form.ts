@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Employee, Department, EmployeeStatus, CreateEmployeeDto } from '@core/models/employee.model';
 import { EmployeeService } from '@core/services/employee.service';
-import { nameValidator, emailValidator, notFutureDateValidator, uniqueEmailValidator, getErrorMessage } from '@core/validators/custom-validators';
+import { nameValidator, emailValidator, notFutureDateValidator, uniqueEmailValidator, uniqueNameValidator, ageValidator, getErrorMessage } from '@core/validators/custom-validators';
+import { first } from 'rxjs/operators';
 
 @Component({
   selector: 'app-employee-form',
@@ -35,7 +36,10 @@ export class EmployeeForm implements OnInit {
 
   private initForm(): void {
     this.employeeForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3), nameValidator()]],
+      name: ['',
+        [Validators.required, Validators.minLength(3), nameValidator()],
+        [uniqueNameValidator(this.employeeService, this.employee?.id)]
+      ],
       email: ['',
         [Validators.required, Validators.email, emailValidator()],
         [uniqueEmailValidator(this.employeeService, this.employee?.id)]
@@ -44,7 +48,7 @@ export class EmployeeForm implements OnInit {
       dateOfJoining: ['', [Validators.required, notFutureDateValidator()]],
       status: [EmployeeStatus.Active],
       performance: [85, [Validators.min(0), Validators.max(100)]],
-      age: [30, [Validators.required, Validators.min(18), Validators.max(59)]],
+      age: [null, [Validators.required, ageValidator()]],
       gender: ['Male', Validators.required]
     });
   }
@@ -65,10 +69,38 @@ export class EmployeeForm implements OnInit {
   }
 
   onSubmit(): void {
+    // Block submission if form is invalid OR async validators are still pending
+    if (this.employeeForm.pending) {
+      // Wait for async validators to complete, then retry
+      this.employeeForm.statusChanges.pipe(
+        first((status: string) => status !== 'PENDING')
+      ).subscribe(() => this.onSubmit());
+      return;
+    }
+
     if (this.employeeForm.valid) {
+      const formValue = this.employeeForm.value;
+
+      // CRITICAL: Double-check for duplicates at service level as safety net
+      const nameExists = this.employeeService.nameExists(formValue.name, this.employee?.id);
+      const emailExists = this.employeeService.emailExists(formValue.email, this.employee?.id);
+
+      // CRITICAL: Explicit age validation as final safety net
+      const ageValue = Number(formValue.age);
+      const ageInvalid = isNaN(ageValue) || ageValue < 18 || ageValue > 59;
+
+      if (nameExists || emailExists || ageInvalid) {
+        // Trigger validation display
+        this.markFormGroupTouched(this.employeeForm);
+        // Force revalidation to show the error
+        this.employeeForm.get('name')?.updateValueAndValidity();
+        this.employeeForm.get('email')?.updateValueAndValidity();
+        this.employeeForm.get('age')?.updateValueAndValidity();
+        return;
+      }
+
       this.isSubmitting = true;
 
-      const formValue = this.employeeForm.value;
       const employeeData: CreateEmployeeDto = {
         name: formValue.name,
         email: formValue.email,
@@ -107,7 +139,13 @@ export class EmployeeForm implements OnInit {
 
   isValid(fieldName: string): boolean {
     const control = this.employeeForm.get(fieldName);
-    return !!(control && control.touched && control.valid);
+    // Only show valid if not pending async validation
+    return !!(control && control.touched && control.valid && !control.pending);
+  }
+
+  isPending(fieldName: string): boolean {
+    const control = this.employeeForm.get(fieldName);
+    return !!(control && control.pending);
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {

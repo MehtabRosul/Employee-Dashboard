@@ -307,10 +307,59 @@ This project was engineered with a focus on demonstrating mastery across core fr
 |:---|:---|
 | **Data Persistence** | Encrypted localStorage ensures data survives page refreshes and browser restarts. |
 | **Real-Time Search** | Debounced search input with computed signals updates results instantly without API calls. |
-| **Form Validations** | Multi-layer validation: required fields, pattern matching, date range constraints, and duplicate email prevention. |
+| **Form Validations** | Multi-layer validation: required fields, pattern matching, date range constraints, and duplicate prevention. |
 | **Bulk Operations** | CSV export with proper escaping handles special characters, commas, and newlines in data. |
 | **State Sync** | Signals automatically propagate changes from forms to lists to dashboard KPIs in real-time. |
 | **Error Handling** | Try-catch blocks with graceful fallbacks prevent crashes from corrupted storage data. |
+
+---
+
+### 📝 Employee Form — Validation & Logic
+
+The Add/Edit Employee form implements **enterprise-grade validation** with triple-layer protection:
+
+#### 🔒 Triple-Layer Validation Architecture
+
+| Layer | Purpose | Implementation |
+|:---|:---|:---|
+| **1. Form Validators** | Real-time feedback | Custom Angular validators show errors as user types |
+| **2. Submit Guard** | Pre-submission check | `onSubmit()` explicitly validates before emitting data |
+| **3. Service Layer** | Final safety net | `EmployeeService` throws errors for invalid data |
+
+#### ✅ Field Validation Rules
+
+| Field | Validation Rules | Error Messages |
+|:---|:---|:---|
+| **Full Name** | Required, min 2 chars, letters/spaces only, **unique** | "Name already taken" |
+| **Email** | Required, valid format, **unique** | "Email already in use" |
+| **Department** | Required, must select from dropdown | "Department is required" |
+| **Date of Joining** | Required, cannot be future date | "Date cannot be in the future" |
+| **Gender** | Required, must select | "Gender is required" |
+| **Age** | Required, **18-59 years only** | "Minimum age is 18 years" / "Maximum age is 59 years" |
+| **Performance** | 0-100% range slider | N/A (slider enforces range) |
+
+#### ⚡ Async Validation (Real-Time Uniqueness Check)
+
+-   **Debounced Requests**: 500ms debounce prevents excessive checks on every keystroke
+-   **"Checking availability..."**: Visual feedback while async validators run
+-   **Prevents Submit**: Button disabled while validation is pending
+-   **Case-Insensitive**: "John Doe" and "john doe" are treated as duplicates
+
+#### 🛡️ Age Validation Deep Dive
+
+```typescript
+// Custom age validator with explicit range check
+export function ageValidator(): ValidatorFn {
+    return (control) => {
+        const value = Number(control.value);
+        if (value < 18) return { ageTooYoung: true };
+        if (value > 59) return { ageTooOld: true };
+        return null;
+    };
+}
+```
+
+**Why 18-59?** This represents the legal working age range, ensuring compliance with labor regulations.
 
 ---
 

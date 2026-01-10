@@ -15,7 +15,9 @@
             <div class="input-error" *ngIf="hasError('name')">
                 {{ getError('name') }}
             </div>
-            <div class="input-hint" *ngIf="!hasError('name')">Minimum 3 characters, letters only</div>
+            <div class="input-hint checking" *ngIf="isPending('name')">Checking availability...</div>
+            <div class="input-hint" *ngIf="!hasError('name') && !isPending('name')">Minimum 3 characters, letters only
+            </div>
         </div>
 
         <!-- Email Field -->
@@ -28,6 +30,7 @@
             <div class="input-error" *ngIf="hasError('email')">
                 {{ getError('email') }}
             </div>
+            <div class="input-hint checking" *ngIf="isPending('email')">Checking availability...</div>
         </div>
 
         <!-- Department Field -->
@@ -81,11 +84,11 @@
                 Age <span class="input-required">*</span>
             </label>
             <input id="age" type="number" class="input" [class.error]="hasError('age')" [class.success]="isValid('age')"
-                formControlName="age" placeholder="Enter age" min="18" max="59" />
+                formControlName="age" placeholder="Enter age (18-59)" />
             <div class="input-error" *ngIf="hasError('age')">
                 {{ getError('age') }}
             </div>
-            <div class="input-hint" *ngIf="!hasError('age')">Valid age range: 18-59 years</div>
+            <div class="input-hint" *ngIf="!hasError('age')">Valid working age range: 18-59 years</div>
         </div>
 
         <!-- Status Field -->
@@ -118,7 +121,8 @@
                 Cancel
             </button>
 
-            <button type="submit" class="btn-primary" [disabled]="employeeForm.invalid || isSubmitting">
+            <button type="submit" class="btn-primary"
+                [disabled]="employeeForm.invalid || employeeForm.pending || isSubmitting">
                 <span *ngIf="!isSubmitting">{{ employee ? 'Update Employee' : 'Add Employee' }}</span>
                 <span *ngIf="isSubmitting" class="flex items-center gap-2">
                     <span class="spinner spinner-sm"></span>

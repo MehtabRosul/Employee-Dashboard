@@ -285,23 +285,38 @@ export class EmployeeList {
       return;
     }
 
-    // Update employee
-    const result = this.employeeService.updateEmployee(employee.id, {
-      name: this.editForm.name,
-      email: this.editForm.email,
-      department: this.editForm.department,
-      status: this.editForm.status,
-      performance: this.editForm.performance,
-      dateOfJoining: new Date(this.editForm.dateOfJoining),
-      gender: this.editForm.gender as 'Male' | 'Female' | 'Other',
-      age: this.editForm.age as number
-    });
+    // Check for duplicates before updating
+    if (this.employeeService.nameExists(this.editForm.name, employee.id)) {
+      this.showNotification('error', 'Name Conflict', 'Name already taken');
+      return;
+    }
+    if (this.employeeService.emailExists(this.editForm.email, employee.id)) {
+      this.showNotification('error', 'Email Conflict', 'Email already in use');
+      return;
+    }
 
-    if (result) {
-      this.closeEditDialog();
-      this.showNotification('success', 'Changes Saved!', `${this.editForm.name}'s information has been updated successfully.`);
-    } else {
-      this.showNotification('error', 'Update Failed', 'Something went wrong while saving. Please try again or contact support.');
+    try {
+      // Update employee
+      const result = this.employeeService.updateEmployee(employee.id, {
+        name: this.editForm.name,
+        email: this.editForm.email,
+        department: this.editForm.department,
+        status: this.editForm.status,
+        performance: this.editForm.performance,
+        dateOfJoining: new Date(this.editForm.dateOfJoining),
+        gender: this.editForm.gender as 'Male' | 'Female' | 'Other',
+        age: this.editForm.age as number
+      });
+
+      if (result) {
+        this.closeEditDialog();
+        this.showNotification('success', 'Changes Saved!', `${this.editForm.name}'s information has been updated successfully.`);
+      } else {
+        this.showNotification('error', 'Update Failed', 'Something went wrong while saving. Please try again.');
+      }
+    } catch (error: any) {
+      const errorMessage = error?.message || 'An unexpected error occurred. Please try again.';
+      this.showNotification('error', 'Update Failed', errorMessage);
     }
   }
 
@@ -469,6 +484,8 @@ export class EmployeeList {
       errors['name'] = 'Please enter your full name (First & Last Name)';
     } else if (this.addForm.name.trim().length < 3) {
       errors['name'] = 'Name must be at least 3 characters long';
+    } else if (this.employeeService.nameExists(this.addForm.name.trim())) {
+      errors['name'] = 'Name already taken';
     }
 
     // Email validation
@@ -480,7 +497,7 @@ export class EmployeeList {
       if (!emailRegex.test(this.addForm.email)) {
         errors['email'] = 'Please enter a valid, verified email address';
       } else if (this.employeeService.emailExists(this.addForm.email)) {
-        errors['email'] = 'This email is already registered';
+        errors['email'] = 'Email already in use';
       }
     }
 
@@ -545,8 +562,10 @@ export class EmployeeList {
 
       this.closeAddDialog();
       this.showNotification('success', 'Employee Added!', `${newEmployee.name} has been successfully added to the team.`);
-    } catch (error) {
-      this.showNotification('error', 'Failed to Add Employee', 'An unexpected error occurred. Please try again or contact support.');
+    } catch (error: any) {
+      // Show the actual error message from the service
+      const errorMessage = error?.message || 'An unexpected error occurred. Please try again.';
+      this.showNotification('error', 'Failed to Add Employee', errorMessage);
     }
   }
 
