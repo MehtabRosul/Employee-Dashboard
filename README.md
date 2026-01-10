@@ -391,4 +391,4 @@ Employee data contains **Personally Identifiable Information (PII)**: names, ema
 ## 📄 License & Proprietary Rights
 
 **© 2026 Employee Management System.**
-Please visit $ view the dashboard and let me know your decision Thank-You.
+Please visit & view the dashboard and let me know your decision Thank-You.
