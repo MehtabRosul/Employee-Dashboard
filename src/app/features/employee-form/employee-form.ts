@@ -44,7 +44,7 @@ export class EmployeeForm implements OnInit {
       dateOfJoining: ['', [Validators.required, notFutureDateValidator()]],
       status: [EmployeeStatus.Active],
       performance: [85, [Validators.min(0), Validators.max(100)]],
-      age: [30, [Validators.required, Validators.min(18), Validators.max(100)]],
+      age: [30, [Validators.required, Validators.min(18), Validators.max(59)]],
       gender: ['Male', Validators.required]
     });
   }

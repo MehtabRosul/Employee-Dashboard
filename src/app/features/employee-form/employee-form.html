@@ -58,10 +58,40 @@
             <div class="input-hint" *ngIf="!hasError('dateOfJoining')">Cannot be a future date</div>
         </div>
 
+        <!-- Gender Field -->
+        <div class="input-group">
+            <label class="input-label" for="gender">
+                Gender <span class="input-required">*</span>
+            </label>
+            <select id="gender" class="input" [class.error]="hasError('gender')" [class.success]="isValid('gender')"
+                formControlName="gender">
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+            </select>
+            <div class="input-error" *ngIf="hasError('gender')">
+                {{ getError('gender') }}
+            </div>
+        </div>
+
+        <!-- Age Field -->
+        <div class="input-group">
+            <label class="input-label" for="age">
+                Age <span class="input-required">*</span>
+            </label>
+            <input id="age" type="number" class="input" [class.error]="hasError('age')" [class.success]="isValid('age')"
+                formControlName="age" placeholder="Enter age" min="18" max="59" />
+            <div class="input-error" *ngIf="hasError('age')">
+                {{ getError('age') }}
+            </div>
+            <div class="input-hint" *ngIf="!hasError('age')">Valid age range: 18-59 years</div>
+        </div>
+
         <!-- Status Field -->
         <div class="input-group">
             <label class="input-label" for="status">
-                Employment Status
+                Status
             </label>
             <select id="status" class="input" formControlName="status">
                 <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
